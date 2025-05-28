@@ -25,8 +25,24 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Servir les fichiers statiques
+# Servir les fichiers statiques à la racine et dans /static
 app.mount("/static", StaticFiles(directory="."), name="static")
+
+@app.get("/app.js")
+async def serve_app_js():
+    """Servir le fichier app.js directement"""
+    if os.path.exists("app.js"):
+        return FileResponse("app.js", media_type="application/javascript")
+    else:
+        raise HTTPException(status_code=404, detail="app.js non trouvé")
+
+@app.get("/")
+async def serve_index():
+    """Servir la page d'accueil"""
+    if os.path.exists("index.html"):
+        return FileResponse("index.html")
+    else:
+        raise HTTPException(status_code=404, detail="Page d'accueil non trouvée")
 
 # Modèles Pydantic
 class AnalyzeRequest(BaseModel):
@@ -368,13 +384,32 @@ async def analyze_robots(request: AnalyzeRequest):
         warnings=parser.warnings
     )
 
-@app.get("/")
-async def serve_index():
-    """Servir la page d'accueil"""
-    if os.path.exists("index.html"):
-        return FileResponse("index.html")
+# Route catch-all pour les fichiers statiques (doit être en dernier)
+@app.get("/{file_path:path}")
+async def serve_static_files(file_path: str):
+    """Servir les fichiers statiques depuis la racine"""
+    # Éviter les routes API
+    if file_path.startswith("analyze") or file_path.startswith("docs") or file_path.startswith("openapi"):
+        raise HTTPException(status_code=404, detail="Route non trouvée")
+    
+    # Sécurité : éviter les chemins avec .. 
+    if ".." in file_path:
+        raise HTTPException(status_code=404, detail="Chemin non autorisé")
+    
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        # Déterminer le type MIME
+        if file_path.endswith('.js'):
+            media_type = "application/javascript"
+        elif file_path.endswith('.css'):
+            media_type = "text/css"
+        elif file_path.endswith('.html'):
+            media_type = "text/html"
+        else:
+            media_type = None
+        
+        return FileResponse(file_path, media_type=media_type)
     else:
-        raise HTTPException(status_code=404, detail="Page d'accueil non trouvée")
+        raise HTTPException(status_code=404, detail="Fichier non trouvé")
 
 if __name__ == "__main__":
     import uvicorn
