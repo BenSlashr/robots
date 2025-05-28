@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robots.txt Checker - Slashr</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: black;
+            min-height: 100vh;
+        }
+        .container-main {
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .header-gradient {
+            background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+        }
+    </style>
+</head>
+<body class="text-white">
+    <header class="bg-gray-900 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <img src="https://agence-slashr.fr/wp-content/uploads/2023/10/slashr-logo-white.svg" alt="Slashr Logo" class="w-30 h-8">
+                    <h1 class="text-xl font-bold text-white">Robots.txt Checker</h1>
+                </div>
+                <nav>
+                    <ul class="flex space-x-6">
+                        <li><a href="https://outils.agence-slashr.fr" class="text-gray-300 hover:text-white transition-colors">Nos outils</a></li>
+                        <li><a href="https://agence-slashr.fr/seo/" class="text-gray-300 hover:text-white transition-colors">Agence SEO à Lille</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="min-h-screen pt-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Hero Section -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">
+                    Vérifiez votre <span class="header-gradient bg-clip-text text-transparent">robots.txt</span>
+                </h1>
+                <p class="text-xl text-gray-300 max-w-3xl mx-auto">
+                    Analysez votre fichier robots.txt selon les règles de Googlebot et testez l'accessibilité de vos URLs
+                </p>
+            </div>
+
+            <!-- Main Form -->
+            <div class="container-main rounded-lg border border-gray-700 p-8 mb-8">
+                <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                    <div class="w-1 h-6 header-gradient rounded mr-3"></div>
+                    Analyse du robots.txt
+                </h2>
+
+                <form id="robotsForm" class="space-y-6">
+                    <!-- URL Input -->
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="siteUrl" class="block text-sm font-medium mb-2">URL du site</label>
+                            <input 
+                                type="url" 
+                                id="siteUrl" 
+                                name="siteUrl"
+                                placeholder="https://example.com" 
+                                class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                        </div>
+                        <div>
+                            <label for="userAgents" class="block text-sm font-medium mb-2">User-Agents à tester</label>
+                            <select 
+                                id="userAgents" 
+                                name="userAgents" 
+                                multiple 
+                                class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            >
+                                <option value="googlebot" selected>Googlebot</option>
+                                <option value="googlebot-image">Googlebot-Image</option>
+                                <option value="googlebot-news">Googlebot-News</option>
+                                <option value="googlebot-video">Googlebot-Video</option>
+                                <option value="*">* (Tous les robots)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Robots.txt Content -->
+                    <div>
+                        <label for="robotsContent" class="block text-sm font-medium mb-2">
+                            Ou collez le contenu du robots.txt
+                            <span class="text-gray-400 text-xs">(se désactive automatiquement si une URL est fournie)</span>
+                        </label>
+                        <textarea 
+                            id="robotsContent" 
+                            name="robotsContent"
+                            rows="8" 
+                            placeholder="User-agent: *&#10;Disallow: /admin/&#10;Allow: /&#10;&#10;Sitemap: https://example.com/sitemap.xml"
+                            class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                        ></textarea>
+                    </div>
+
+                    <!-- Paths to Test -->
+                    <div>
+                        <label for="testPaths" class="block text-sm font-medium mb-2">Chemins à tester (doit commencer par /)</label>
+                        <textarea 
+                            id="testPaths" 
+                            name="testPaths"
+                            rows="4" 
+                            placeholder="/&#10;/admin/&#10;/wp-content/uploads/&#10;/shop/product-123"
+                            class="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                        ></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-center">
+                        <button 
+                            type="submit" 
+                            class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900"
+                        >
+                            Analyser
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsSection" class="container-main rounded-lg border border-gray-700 p-8 hidden">
+                <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                    <div class="w-1 h-6 header-gradient rounded mr-3"></div>
+                    Résultats
+                </h2>
+                
+                <!-- Status -->
+                <div id="statusSection" class="mb-6">
+                    <!-- Status content will be inserted here -->
+                </div>
+
+                <!-- Warnings -->
+                <div id="warningsSection" class="mb-6 hidden">
+                    <!-- Warnings content will be inserted here -->
+                </div>
+
+                <!-- Groups Table -->
+                <div id="groupsSection" class="mb-6">
+                    <!-- Groups content will be inserted here -->
+                </div>
+
+                <!-- Test Results Table -->
+                <div id="testResultsSection">
+                    <!-- Test results content will be inserted here -->
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="container-main rounded-lg border border-gray-700 p-8 mt-8">
+                <h2 class="text-2xl font-semibold mb-6 flex items-center">
+                    <div class="w-1 h-6 header-gradient rounded mr-3"></div>
+                    Questions fréquentes sur le robots.txt checker
+                </h2>
+                
+                <div class="space-y-4">
+                    <!-- Question 1 -->
+                    <div class="bg-gray-800 rounded-lg">
+                        <button class="faq-question w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-750 transition-colors" onclick="toggleFAQ(1)">
+                            <span class="font-medium">Qu'est-ce qu'un robots.txt checker et pourquoi l'utiliser ?</span>
+                            <svg id="faq-icon-1" class="w-5 h-5 transform transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div id="faq-answer-1" class="px-6 pb-4 hidden">
+                            <p class="text-gray-300">Un <strong>robots.txt checker</strong> est un outil qui analyse votre fichier robots.txt pour vérifier qu'il respecte les standards et les règles d'interprétation de Googlebot. Notre <strong>robots.txt testeur</strong> vous permet de détecter les erreurs de syntaxe, de tester l'accessibilité de vos URLs et de simuler le comportement des robots de Google sur votre site.</p>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="bg-gray-800 rounded-lg">
+                        <button class="faq-question w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-750 transition-colors" onclick="toggleFAQ(2)">
+                            <span class="font-medium">Comment utiliser ce robots.txt testeur gratuitement ?</span>
+                            <svg id="faq-icon-2" class="w-5 h-5 transform transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div id="faq-answer-2" class="px-6 pb-4 hidden">
+                            <p class="text-gray-300">C'est très simple ! Saisissez l'URL de votre site (l'outil ira automatiquement chercher le fichier /robots.txt) ou collez directement le contenu de votre robots.txt. Sélectionnez les user-agents Google à tester, ajoutez les chemins d'URL que vous souhaitez vérifier, puis cliquez sur "Analyser". Notre <strong>robots.txt checker</strong> vous donnera instantanément un rapport détaillé.</p>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="bg-gray-800 rounded-lg">
+                        <button class="faq-question w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-750 transition-colors" onclick="toggleFAQ(3)">
+                            <span class="font-medium">Quelles sont les règles de Googlebot reproduites par ce testeur ?</span>
+                            <svg id="faq-icon-3" class="w-5 h-5 transform transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div id="faq-answer-3" class="px-6 pb-4 hidden">
+                            <p class="text-gray-300">Notre <strong>robots.txt checker</strong> reproduit fidèlement le comportement de Google : analyse limitée aux premiers 500 KiB, encodage UTF-8, gestion des commentaires (#), regroupement par User-agent, sélection du groupe le plus spécifique, correspondance des motifs avec * et $, règle la plus longue qui gagne avec priorité aux directives Allow.</p>
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div class="bg-gray-800 rounded-lg">
+                        <button class="faq-question w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-750 transition-colors" onclick="toggleFAQ(4)">
+                            <span class="font-medium">Que faire si mon robots.txt renvoie une erreur 404 ?</span>
+                            <svg id="faq-icon-4" class="w-5 h-5 transform transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div id="faq-answer-4" class="px-6 pb-4 hidden">
+                            <p class="text-gray-300">Si votre fichier robots.txt renvoie une erreur 404 ou 5xx, Google considère que tout est autorisé sur votre site. Notre <strong>robots.txt testeur</strong> reproduit ce comportement et vous indiquera que tous les chemins testés sont accessibles. Il est recommandé de créer un fichier robots.txt même s'il autorise tout, ne serait-ce que pour indiquer l'emplacement de votre sitemap.</p>
+                        </div>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div class="bg-gray-800 rounded-lg">
+                        <button class="faq-question w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-750 transition-colors" onclick="toggleFAQ(5)">
+                            <span class="font-medium">Comment tester différents User-Agents avec ce robots.txt checker ?</span>
+                            <svg id="faq-icon-5" class="w-5 h-5 transform transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div id="faq-answer-5" class="px-6 pb-4 hidden">
+                            <p class="text-gray-300">Notre outil supporte tous les principaux bots de Google : Googlebot (crawler principal), Googlebot-Image (images), Googlebot-News (actualités), Googlebot-Video (vidéos) et le joker * (tous les robots). Vous pouvez sélectionner plusieurs User-Agents simultanément pour voir comment chacun interprète votre robots.txt selon les règles de priorité de Google.</p>
+                        </div>
+                    </div>
+
+                    <!-- Question 6 -->
+                    <div class="bg-gray-800 rounded-lg">
+                        <button class="faq-question w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-750 transition-colors" onclick="toggleFAQ(6)">
+                            <span class="font-medium">Quelles erreurs communes ce robots.txt testeur peut-il détecter ?</span>
+                            <svg id="faq-icon-6" class="w-5 h-5 transform transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div id="faq-answer-6" class="px-6 pb-4 hidden">
+                            <p class="text-gray-300">Ce <strong>robots.txt checker</strong> détecte les directives ignorées par Google (Crawl-delay, Host, Clean-param), les lignes mal formatées, l'absence de groupe User-agent: *, les fichiers trop volumineux (>500 KiB), les erreurs de syntaxe dans les motifs, et les conflits entre règles Allow et Disallow. Il vous aide à optimiser votre robots.txt pour un meilleur SEO.</p>
+                        </div>
+                    </div>
+
+                    <!-- Question 7 -->
+                    <div class="bg-gray-800 rounded-lg">
+                        <button class="faq-question w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-750 transition-colors" onclick="toggleFAQ(7)">
+                            <span class="font-medium">Puis-je utiliser ce robots.txt testeur pour analyser le contenu directement ?</span>
+                            <svg id="faq-icon-7" class="w-5 h-5 transform transition-transform" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                            </svg>
+                        </button>
+                        <div id="faq-answer-7" class="px-6 pb-4 hidden">
+                            <p class="text-gray-300">Absolument ! Notre <strong>robots.txt checker</strong> vous permet soit de saisir une URL (pour récupérer automatiquement le fichier), soit de coller directement le contenu de votre robots.txt dans la zone de texte. C'est très pratique pour tester des modifications avant de les mettre en ligne ou pour analyser des fichiers robots.txt hors ligne.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://outils.agence-slashr.fr/robots/app.js"></script>
+    <script>
+        function toggleFAQ(questionNumber) {
+            const answer = document.getElementById(`faq-answer-${questionNumber}`);
+            const icon = document.getElementById(`faq-icon-${questionNumber}`);
+            
+            if (answer.classList.contains('hidden')) {
+                answer.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+            } else {
+                answer.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+</body>
+</html> 
