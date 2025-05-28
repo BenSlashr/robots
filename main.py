@@ -1,13 +1,20 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, HttpUrl
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pydantic import BaseModel, HttpUrl, Field
 from typing import List, Optional, Union
 import httpx
 import re
 import asyncio
 from urllib.parse import urljoin, urlparse
+import os
 
-app = FastAPI(title="Robots.txt Checker", description="Vérificateur de robots.txt selon les règles de Googlebot")
+app = FastAPI(
+    title="Robots.txt Checker API",
+    description="API pour analyser et tester les fichiers robots.txt selon les règles de Googlebot",
+    version="1.0.0"
+)
 
 # Configuration CORS
 app.add_middleware(
@@ -17,6 +24,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Servir les fichiers statiques
+app.mount("/static", StaticFiles(directory="."), name="static")
 
 # Modèles Pydantic
 class AnalyzeRequest(BaseModel):
@@ -359,9 +369,12 @@ async def analyze_robots(request: AnalyzeRequest):
     )
 
 @app.get("/")
-async def root():
-    """Point d'entrée de l'API"""
-    return {"message": "Robots.txt Checker API", "docs": "/docs"}
+async def serve_index():
+    """Servir la page d'accueil"""
+    if os.path.exists("index.html"):
+        return FileResponse("index.html")
+    else:
+        raise HTTPException(status_code=404, detail="Page d'accueil non trouvée")
 
 if __name__ == "__main__":
     import uvicorn

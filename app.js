@@ -1,5 +1,5 @@
-// Configuration de l'API
-const API_BASE_URL = 'http://localhost:8000';
+// Configuration de l'API - URL relative pour Docker
+const API_BASE_URL = window.location.origin;
 
 // Éléments du DOM
 const form = document.getElementById('robotsForm');
